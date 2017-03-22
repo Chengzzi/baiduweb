@@ -1,0 +1,128 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>IFE JavaScript Task 01</title>
+    <style type="text/css">
+        #resort li{
+            list-style: none;
+            float: left;
+            height: 40px;
+            background: red;
+            margin: 0 5px;
+            color: #fff;
+            line-height: 40px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+    </style>
+  </head>
+<body>
+
+  <input type="text" id="txt" name="" value="">
+  <input type="button" id="insertFirst" value="左侧入">
+  <input type="button" id="insertLast" value="右侧入">
+  <input type="button" id="deleteFirst" value="左侧出">
+  <input type="button" id="deleteLast" value="右侧出">
+
+  <ul id="resort">
+      
+  </ul>
+
+<script type="text/javascript">
+var lIn,lOut,rIn,rOut,oUl,text;
+var oQueue = new queue();
+    oText = document.getElementById("txt");
+    oUl = document.getElementById("resort");
+    lIn = document.getElementById("insertFirst");
+    rIn = document.getElementById("insertLast");
+    lOut = document.getElementById("deleteFirst");
+    rOut = document.getElementById("deleteLast");
+
+//排版函数
+function render(data){
+    oUl.innerHTML = "";//清空列表
+    //let使i为块级作用域，保留每次i的值，使allLi[i]的click事件不立即执行。
+    for(let i =0;i<data.length;i++){
+        var oLi = document.createElement("li");
+        oLi.innerHTML = data[i];
+        oUl.appendChild(oLi);
+        var allLi = oUl.getElementsByTagName("li");
+
+        //绑定每个li自身点击删除函数
+        allLi[i].onclick = function(){
+            dethis(i);
+        }    
+    }
+}
+
+//队列构造器函数
+function queue(){
+    var list = [];
+    this.insertLast = function(item){
+        list.push(item);
+    };
+    this.insertFirst = function(item){
+        list.unshift(item);
+    };
+    this.deleteLast = function(){
+        list.pop();
+    };
+    this.deleteFirst = function(){
+        list.shift();
+    };
+    this.removeOf = function(index){
+        list.splice(index,1);
+    };
+
+    this.getList = function(){
+        console.log(list);
+        return list;
+        
+    };
+
+}
+//添加li函数
+function addli(fn){
+        var text = oText.value;
+        oQueue[fn](text);
+        var list =oQueue.getList();
+        render(list);
+}
+//删除li函数
+function deli(fn){
+        oQueue[fn](text);
+        var list =oQueue.getList();
+        render(list);
+}
+//删除自身函数
+function dethis(index){
+        oQueue.removeOf(index);
+        var list =oQueue.getList();
+        console.log(index);
+        render(list);
+}
+
+// 按钮绑定初始事件
+function init() {
+    lIn.onclick= function(){
+        addli("insertFirst");
+    }
+    lOut.onclick= function(){
+        deli("deleteFirst");
+    }
+    rIn.onclick= function(){
+        addli("insertLast");
+    }
+    rOut.onclick= function(){
+        deli("deleteLast");
+    }
+
+}
+
+init();
+
+</script>
+</body>
+</html>
