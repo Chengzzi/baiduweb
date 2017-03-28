@@ -4,58 +4,55 @@
     <meta charset="utf-8">
     <title>IFE JavaScript Task 01</title>
     <style type="text/css">
-        #resort li{
+        #ul{
+            position: relative;
+            height: 200px;
+        }
+        #ul li{
             list-style: none;
             float: left;
             height: 40px;
             background: red;
             margin: 0 5px;
             color: #fff;
-            line-height: 40px;
+            /*line-height: 40px;*/
             text-align: center;
             font-size: 20px;
+            position: absolute;
+            bottom: 0;
         }
 
     </style>
   </head>
 <body>
 
-  <input type="text" id="txt" name="" value="">
+  <input type="text" id="txt" name="">
   <input type="button" id="insertFirst" value="左侧入">
   <input type="button" id="insertLast" value="右侧入">
   <input type="button" id="deleteFirst" value="左侧出">
   <input type="button" id="deleteLast" value="右侧出">
+  <input type="button" id="resort" value="排序">
+  <input type="button" id="setrandom" value="5个随机">
+  <input type="button" id="toempty" value="清空">
 
-  <ul id="resort">
-      
+  <ul id="ul">
+    
   </ul>
 
 <script type="text/javascript">
-var lIn,lOut,rIn,rOut,oUl,text;
-var oQueue = new queue();
-    oText = document.getElementById("txt");
-    oUl = document.getElementById("resort");
-    lIn = document.getElementById("insertFirst");
-    rIn = document.getElementById("insertLast");
-    lOut = document.getElementById("deleteFirst");
-    rOut = document.getElementById("deleteLast");
+var lIn,lOut,rIn,rOut,oUl,text,resort,setrandom,toempty;
+var oQueue = new queue(); //建立一个新的队列
+    oText = document.getElementById("txt");//输入框按钮
+    oUl = document.getElementById("ul");//ul盒子
+    lIn = document.getElementById("insertFirst");//左侧入按钮
+    rIn = document.getElementById("insertLast");//右侧入框按钮
+    lOut = document.getElementById("deleteFirst");//左侧出框按钮
+    rOut = document.getElementById("deleteLast");//右侧出框按钮
+    resort = document.getElementById("resort");//排序框按钮
+    setrandom = document.getElementById("setrandom");//随机框按钮
+    toempty =document.getElementById("toempty");//清空框按钮
 
-//排版函数
-function render(data){
-    oUl.innerHTML = "";//清空列表
-    //let使i为块级作用域，保留每次i的值，使allLi[i]的click事件不立即执行。
-    for(let i =0;i<data.length;i++){
-        var oLi = document.createElement("li");
-        oLi.innerHTML = data[i];
-        oUl.appendChild(oLi);
-        var allLi = oUl.getElementsByTagName("li");
 
-        //绑定每个li自身点击删除函数
-        allLi[i].onclick = function(){
-            dethis(i);
-        }    
-    }
-}
 
 //队列构造器函数
 function queue(){
@@ -75,48 +72,110 @@ function queue(){
     this.removeOf = function(index){
         list.splice(index,1);
     };
+    this.toempty=function(){
+        list = [];
+    };
+    this.sort = function(){
+        return list.sort(sortfun);
+    };
     this.size = function(){
         return list.length;
-        
     };
     this.getList = function(){
         console.log(list);
         return list;
-        
     };
+}
 
+function sortfun(a,b){
+    return a-b;
+};
+
+//排版函数
+function render(data){
+    oUl.innerHTML = "";//清空列表
+    //let使i为块级作用域，保留每次i的值，使allLi[i]的click事件不立即执行。
+    for(let i =0;i<data.length;i++){
+        var oLi = document.createElement("li");
+        oLi.innerHTML = data[i];//为li赋值，值为参数队列的值
+        oUl.appendChild(oLi);//Ul添加构造好的li
+        
+        var allLi = oUl.getElementsByTagName("li");
+        allLi[i].style.height = data[i]*2+"px";
+        allLi[i].style.left = i*30+"px";
+        //绑定每个li自身点击删除函数
+        allLi[i].onclick = function(){
+            dethis(i);
+        }    
+    }
 }
 //添加li函数
-function addli(fn){
-        var text = oText.value;
-        oQueue[fn](text);
+function addli(fn,value){
+    var size = oQueue.size();
+    if(size>=60){
+        alert("队列数量超过上限");
+        return;
+    }
+    if(100>=value&&value>=10){
+        
+        oQueue[fn](value);
         var list =oQueue.getList();
         render(list);
+    }else{
+        alert("请输入10~100之间的数值");
+    }
 }
 //删除li函数
 function deli(fn){
-        oQueue[fn](text);
-        var list =oQueue.getList();
-        render(list);
+    var size = oQueue.size();
+    if(size==0){
+        return;
+    }
+    oQueue[fn](text);
+    var list =oQueue.getList();
+    render(list);
 }
 //删除自身函数
 function dethis(index){
-        oQueue.removeOf(index);
-        var list =oQueue.getList();
-        console.log(index);
-        render(list);
+    oQueue.removeOf(index);
+    var list =oQueue.getList();
+    console.log(index);
+    render(list);
 }
-
+    
 // 按钮绑定初始事件
 function init() {
+
+        
+    resort.onclick= function(){
+        var newlist = oQueue.sort();
+        console.log(newlist);
+        render(newlist);
+    }
+    toempty.onclick= function(){
+        oQueue.toempty();
+        var text = oQueue.getList();
+        render(text);
+    }
+    setrandom.onclick= function(){
+        var flag = 0;
+        while(flag<5){
+            console.log(flag);
+            var text = 10+Math.round(Math.random()*90);
+            addli("insertFirst",text);
+            flag++;
+        }  
+    }
     lIn.onclick= function(){
-        addli("insertFirst");
+        var text = oText.value*1;
+        addli("insertFirst",text);
+    }
+    rIn.onclick= function(){
+        var text = oText.value*1;
+        addli("insertLast",text);
     }
     lOut.onclick= function(){
         deli("deleteFirst");
-    }
-    rIn.onclick= function(){
-        addli("insertLast");
     }
     rOut.onclick= function(){
         deli("deleteLast");
